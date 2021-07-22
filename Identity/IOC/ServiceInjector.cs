@@ -32,6 +32,7 @@ namespace Identity.IOC
               
             }).AddPasswordValidator<CustomPasswordValidation>()  //AddPasswordValidator<CustomPasswordValidation> ile özelleştirilmiş şifre validasyonu gerçekleştirilmiştir.
             .AddUserValidator<CustomUserValidation>()//AddUserValidator<CustomUserValidation> ile özelleştirilmiş username validasyonu gerçekleştirilmiştir.
+            .AddErrorDescriber<CustomIdentityErrorDescriber>()//AddErrorDescriber<CustomIdentityErrorDescriber> ile hata mesajları özelleştirilmiştir.
             .AddEntityFrameworkStores<AppDbContext>();
         }
     }
