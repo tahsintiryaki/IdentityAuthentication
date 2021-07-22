@@ -27,8 +27,12 @@ namespace Identity.IOC
                 _.Password.RequireUppercase = false; //Büyük harf zorunluluğunu kaldırıyoruz.
                 _.Password.RequireDigit = false; //0-9 arası sayısal karakter zorunluluğunu kaldırıyoruz.
 
-                //AddPasswordValidator<CustomPasswordValidation> ile özelleştirilmiş şifre validasyonu gerçekleştirilmiştir.
-            }).AddPasswordValidator<CustomPasswordValidation>().AddEntityFrameworkStores<AppDbContext>();
+                _.User.RequireUniqueEmail = true; //Email adreslerini tekilleştiriyoruz.
+                _.User.AllowedUserNameCharacters = "abcçdefghiıjklmnoöpqrsştuüvwxyzABCÇDEFGHIİJKLMNOÖPQRSŞTUÜVWXYZ0123456789-._@+"; //
+              
+            }).AddPasswordValidator<CustomPasswordValidation>()  //AddPasswordValidator<CustomPasswordValidation> ile özelleştirilmiş şifre validasyonu gerçekleştirilmiştir.
+            .AddUserValidator<CustomUserValidation>()//AddUserValidator<CustomUserValidation> ile özelleştirilmiş username validasyonu gerçekleştirilmiştir.
+            .AddEntityFrameworkStores<AppDbContext>();
         }
     }
 }
