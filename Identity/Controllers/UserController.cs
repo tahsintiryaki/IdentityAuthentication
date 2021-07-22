@@ -16,7 +16,7 @@ namespace Identity.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly AppDbContext _context;
-        public UserController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager , AppDbContext context )
+        public UserController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -54,7 +54,7 @@ namespace Identity.Controllers
 
         public IActionResult Login()
         {
-          
+
             return View();
         }
 
@@ -71,7 +71,32 @@ namespace Identity.Controllers
                     Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(user, model.Password, model.Persistent, model.Lock);
 
                     if (result.Succeeded)
-                        return Redirect(TempData["returnUrl"].ToString());
+                    {
+                        await _userManager.ResetAccessFailedCountAsync(user); //Önceki hataları girişler neticesinde +1 arttırılmış tüm değerleri 0(sıfır)a çekiyoruz.
+
+
+                        return RedirectToAction("Index");
+
+                    }
+                    else
+                    {
+                        await _userManager.AccessFailedAsync(user); //Eğer ki başarısız bir account girişi söz konusu ise AccessFailedCount kolonundaki değer +1 arttırılacaktır. 
+
+                        int failcount = await _userManager.GetAccessFailedCountAsync(user); //Kullanıcının yapmış olduğu başarısız giriş deneme adedini alıyoruz.
+                        if (failcount == 3)
+                        {
+                            await _userManager.SetLockoutEndDateAsync(user, new DateTimeOffset(DateTime.Now.AddMinutes(1))); //Eğer ki başarısız giriş denemesi 3'ü bulduysa ilgili kullanıcının hesabını kilitliyoruz.
+                            ModelState.AddModelError("Locked", "Art arda 3 başarısız giriş denemesi yaptığınızdan dolayı hesabınız 1 dk kitlenmiştir.");
+                        }
+                        else
+                        {
+                            if (result.IsLockedOut)
+                                ModelState.AddModelError("Locked", "Art arda 3 başarısız giriş denemesi yaptığınızdan dolayı hesabınız 1 dk kilitlenmiştir.");
+                            else
+                                ModelState.AddModelError("NotUser2", "E-posta veya şifre yanlış.");
+                        }
+
+                    }
                 }
                 else
                 {
