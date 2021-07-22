@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Identity.Models
+namespace Identity.Models.Authentication
 {
-    public class AppUser:IdentityUser
+    public class AppRole:IdentityRole<Guid>
     {
+        public DateTime RecordDate { get; set; }
     }
 }
