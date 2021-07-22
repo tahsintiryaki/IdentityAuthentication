@@ -1,6 +1,7 @@
 ﻿using Identity.CustomValidations;
 using Identity.Models.Authentication;
 using Identity.Models.DbContexts;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +35,23 @@ namespace Identity.IOC
             .AddUserValidator<CustomUserValidation>()//AddUserValidator<CustomUserValidation> ile özelleştirilmiş username validasyonu gerçekleştirilmiştir.
             .AddErrorDescriber<CustomIdentityErrorDescriber>()//AddErrorDescriber<CustomIdentityErrorDescriber> ile hata mesajları özelleştirilmiştir.
             .AddEntityFrameworkStores<AppDbContext>();
+
+
+
+            services.ConfigureApplicationCookie(_ =>
+            {
+                _.LoginPath = new PathString("/User/Login");
+                _.Cookie = new CookieBuilder
+                {
+                    Name = "AspNetCoreIdentityExampleCookie", //Oluşturulacak Cookie'yi isimlendiriyoruz.
+                    HttpOnly = false, //Kötü niyetli insanların client-side tarafından Cookie'ye erişmesini engelliyoruz.
+                  //Expiration property'si yerine ExpireTimeSpan propertysi kullanılmalı yoksa uygulama hata veriyor 
+                    SameSite = SameSiteMode.Lax, //Top level navigasyonlara sebep olmayan requestlere Cookie'nin gönderilmemesini belirtiyoruz.
+                    SecurePolicy = CookieSecurePolicy.Always //HTTPS üzerinden erişilebilir yapıyoruz.
+                };
+                _.SlidingExpiration = true; //Expiration süresinin yarısı kadar süre zarfında istekte bulunulursa eğer geri kalan yarısını tekrar sıfırlayarak ilk ayarlanan süreyi tazeleyecektir.
+                _.ExpireTimeSpan = TimeSpan.FromMinutes(2); //CookieBuilder nesnesinde tanımlanan Expiration değerinin varsayılan değerlerle ezilme ihtimaline karşın tekrardan Cookie vadesi burada da belirtiliyor.
+            });
         }
     }
 }
