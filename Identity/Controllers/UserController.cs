@@ -1,4 +1,5 @@
 ﻿using Identity.Models.Authentication;
+using Identity.Models.DbContexts;
 using Identity.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,13 +13,17 @@ namespace Identity.Controllers
     public class UserController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
-        public UserController(UserManager<AppUser> userManager)
+        private readonly AppDbContext _context;
+        public UserController(UserManager<AppUser> userManager, AppDbContext context)
         {
             _userManager = userManager;
+            _context = context;
+
         }
         public IActionResult Index()
         {
-            return View();
+            var userList = _context.Users.ToList();
+            return View(userList);
         }
 
         public IActionResult SignIn()
@@ -38,6 +43,8 @@ namespace Identity.Controllers
                 IdentityResult result = await _userManager.CreateAsync(appUser, appUserViewModel.Sifre);
                 if (result.Succeeded)
                     return RedirectToAction("Index");
+                else
+                    result.Errors.ToList().ForEach(e => ModelState.AddModelError(e.Code, e.Description));
             }
             return View();
         }

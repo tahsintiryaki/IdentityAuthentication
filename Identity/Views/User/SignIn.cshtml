@@ -13,6 +13,7 @@
     <table>
         <tr>
             <td colspan="3"><div asp-validation-summary="ModelOnly"></div></td>
+            @Html.ValidationSummary(false)
         </tr>
         <tr>
             <td><label asp-for="UserName"></label></td>

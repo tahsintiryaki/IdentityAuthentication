@@ -1,3 +1,4 @@
+using Identity.IOC;
 using Identity.Models.Authentication;
 using Identity.Models.DbContexts;
 using Microsoft.AspNetCore.Builder;
@@ -27,11 +28,14 @@ namespace Identity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                 .AddRazorRuntimeCompilation();
+
             services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
 
-            //Identity Aktif edildi.
-            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
+            //Identity ServiceInjector içerisinde Aktif edildi.
+            ServiceInjector.Add(services, Configuration);
+            //services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
 
 
             
