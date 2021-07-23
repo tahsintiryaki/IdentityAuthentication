@@ -2,6 +2,7 @@
 using Identity.Models.Authentication;
 using Identity.Models.DbContexts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ namespace Identity.IOC
         public static void Add(IServiceCollection services, IConfiguration configurtion)
         {
 
-          
+
 
             //Indentity
             services.AddIdentity<AppUser, AppRole>(_ =>
@@ -30,11 +31,13 @@ namespace Identity.IOC
 
                 _.User.RequireUniqueEmail = true; //Email adreslerini tekilleştiriyoruz.
                 _.User.AllowedUserNameCharacters = "abcçdefghiıjklmnoöpqrsştuüvwxyzABCÇDEFGHIİJKLMNOÖPQRSŞTUÜVWXYZ0123456789-._@+"; //
-              
+
             }).AddPasswordValidator<CustomPasswordValidation>()  //AddPasswordValidator<CustomPasswordValidation> ile özelleştirilmiş şifre validasyonu gerçekleştirilmiştir.
             .AddUserValidator<CustomUserValidation>()//AddUserValidator<CustomUserValidation> ile özelleştirilmiş username validasyonu gerçekleştirilmiştir.
             .AddErrorDescriber<CustomIdentityErrorDescriber>()//AddErrorDescriber<CustomIdentityErrorDescriber> ile hata mesajları özelleştirilmiştir.
-            .AddEntityFrameworkStores<AppDbContext>();
+            .AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();//Şifremi unuttum işlemi için eklenmesi gerekmektedir.
+
 
 
 

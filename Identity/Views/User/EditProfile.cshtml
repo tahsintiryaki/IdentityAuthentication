@@ -1,0 +1,39 @@
+﻿@model Identity.Models.ViewModels.UserDetailViewModel
+@{
+    ViewData["Title"] = "EditProfile";
+}
+
+<h3>Profil Güncelle</h3>
+
+<hr />
+
+<form asp-action="EditProfile">
+    <table>
+        <tr>
+            <td colspan="3"><div asp-validation-summary="All"></div></td>
+        </tr>
+        <tr>
+            <td><label asp-for="UserName"></label></td>
+            <td><input asp-for="UserName" /></td>
+            <td><span asp-validation-for="UserName"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="PhoneNumber"></label></td>
+            <td><input asp-for="PhoneNumber" /></td>
+            <td><span asp-validation-for="PhoneNumber"></span></td>
+        </tr>
+        <tr>
+            <td colspan="3"><input type="submit" value="Güncelle" /></td>
+        </tr>
+    </table>
+    <input type="hidden" asp-for="Id" />
+</form>
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+@if (ViewBag.Success != null)
+{
+    <div class="alert alert-success">@ViewBag.Success</div>
+}
+
