@@ -11,16 +11,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
 namespace Identity.Controllers
 {
+
     public class UserController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
+
         private readonly AppDbContext _context;
         public UserController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDbContext context)
         {
@@ -29,12 +32,13 @@ namespace Identity.Controllers
             _context = context;
 
         }
-        [Authorize]
+        [Authorize(Roles ="Moderatör")]
         public IActionResult Index()
         {
             return View(_userManager.Users);
         }
 
+        [Authorize(Policy = "SignInPolicy")]
         public IActionResult SignIn()
         {
             return View();
@@ -70,6 +74,8 @@ namespace Identity.Controllers
             if (ModelState.IsValid)
             {
                 AppUser user = await _userManager.FindByEmailAsync(model.Email);
+              
+
                 if (user != null)
                 {
                     //İlgili kullanıcıya dair önceden oluşturulmuş bir Cookie varsa siliyoruz.
@@ -79,7 +85,6 @@ namespace Identity.Controllers
                     if (result.Succeeded)
                     {
                         await _userManager.ResetAccessFailedCountAsync(user); //Önceki hataları girişler neticesinde +1 arttırılmış tüm değerleri 0(sıfır)a çekiyoruz.
-
 
                         return RedirectToAction("Index");
 
@@ -118,6 +123,7 @@ namespace Identity.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Policy = "PasswordResetPolicy")]
         public IActionResult PasswordReset()
         {
             return View();
@@ -183,7 +189,7 @@ namespace Identity.Controllers
             return View();
         }
 
-
+        [Authorize(Policy = "EditProfilePolicy")]
         public async Task<IActionResult> EditProfile(Guid userId)
         {
             AppUser user = await _userManager.FindByIdAsync(userId.ToString());
@@ -212,5 +218,13 @@ namespace Identity.Controllers
             }
             return View();
         }
+
+        public IActionResult Error()
+        {
+            return View();
+        }
+
+
+
     }
 }

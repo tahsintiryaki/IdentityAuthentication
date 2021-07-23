@@ -37,8 +37,23 @@ namespace Identity
             ServiceInjector.Add(services, Configuration);
             //services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<AppDbContext>();
 
+            //services.AddAuthorization(x => x.AddPolicy("UserClaimNamePolicy", policy => policy.RequireClaim("EditProfile")));
 
-            
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("EditProfilePolicy",
+                    policy => policy.RequireClaim("EditProfile"));
+
+                options.AddPolicy("SignInPolicy",
+                   policy => policy.RequireClaim("SignIn"));
+
+                options.AddPolicy("PasswordResetPolicy",
+                   policy => policy.RequireClaim("PasswordReset"));
+
+
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
